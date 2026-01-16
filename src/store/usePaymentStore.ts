@@ -43,9 +43,24 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
 
   connect: () => {
     if (eventSource) eventSource.close();
-    if (fastInterval) clearInterval(fastInterval);
-    if (graphInterval) clearInterval(graphInterval);
-    if (reconnectInterval) clearTimeout(reconnectInterval);
+    eventSource = null; // Ensure eventSource is cleared
+    // 0. Ensure complete cleanup of previous state
+    if (fastInterval) {
+      clearInterval(fastInterval);
+      fastInterval = null;
+    }
+    if (graphInterval) {
+      clearInterval(graphInterval);
+      graphInterval = null;
+    }
+    if (reconnectInterval) {
+      clearTimeout(reconnectInterval);
+      reconnectInterval = null; // Clean up reconnect interval
+    }
+
+    // Reset buffers to prevent stale data mixing
+    eventBuffer = [];
+    graphBuffer = [];
 
     eventSource = new EventSource(
       `${process.env.NEXT_PUBLIC_BASE_URL}/events?email=${process.env.NEXT_PUBLIC_EMAIL}`
@@ -55,6 +70,9 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
       set({ connectionStatus: "connected" });
 
       // 2. START FRESH INTERVALS ONLY ON SUCCESSFUL OPEN
+      // Fix: Check and clear existing intervals to avoid duplicates if onopen fires multiple times
+      if (fastInterval) clearInterval(fastInterval);
+      if (graphInterval) clearInterval(graphInterval);
 
       // THE Fast Flush: Periodically move buffer to state (every 100ms)
       fastInterval = setInterval(() => {
@@ -190,5 +208,6 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
 
     // Optional: Clear the buffer so old data doesn't pop up on reconnect
     eventBuffer = [];
+    graphBuffer = [];
   },
 }));
