@@ -105,3 +105,5 @@ npm run start
 - `npm run build`: Build the application for production.
 - `npm run start`: Run the built production server.
 - `npm run lint`: Run ESLint checks.
+
+> Assignment Link : https://www.notion.so/xpaycheckout/Frontend-Take-Home-Assignment-2e753c9859848096a038f789a28f0cd8
