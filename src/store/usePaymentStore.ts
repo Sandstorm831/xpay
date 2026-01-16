@@ -5,6 +5,7 @@ import {
   DashboardStats,
   ConnectionEvent,
 } from "../types/payment";
+import { convertToUSD } from "../lib/utils";
 
 interface PaymentState {
   events: PaymentEvent[];
@@ -25,6 +26,7 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
   stats: {
     totalVolume: 0,
     totalCount: 0,
+    totalSuccess: 0,
     byCountry: {},
     byMethod: {},
   },
@@ -76,16 +78,14 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
         newEvents.forEach((evt) => {
           console.log(evt);
           updatedStats.totalCount += 1;
-          updatedStats.totalVolume += evt.amount;
+          const amountInUSD = convertToUSD(evt.amount, evt.currency);
+          updatedStats.totalVolume += amountInUSD;
+          updatedStats.totalSuccess += (evt.status === 'success' ? 1 : 0);
           updatedStats.byCountry[evt.country] =
             (updatedStats.byCountry[evt.country] || 0) + 1;
           updatedStats.byMethod[evt.paymentMethod] =
             (updatedStats.byMethod[evt.paymentMethod] || 0) + 1;
-          console.log(
-            "store update event: ",
-            updatedStats.byCountry,
-            evt.country
-          );
+          if (evt.status === 'failed') console.log("failed event: ", evt)
         });
 
         return {
