@@ -9,7 +9,7 @@ import MethodDistribution from './MethodDistribution';
 export default function Dashboard() {
   const connect = usePaymentStore((state) => state.connect);
   const disconnect = usePaymentStore((state) => state.disconnect);
-  const isConnected = usePaymentStore((state) => state.isConnected);
+  const isConnected = usePaymentStore((state) => state.connectionStatus);
 
   useEffect(() => {
     connect();
