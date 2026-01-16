@@ -38,15 +38,15 @@ export default function Metrics() {
       />
       <MetricCard
         title="Success Rate"
-        value={100}
+        value={stats.totalSuccess / (stats.totalCount || 1) * 100}
         suffix="%"
         isCurrency={false}
         color="text-purple-500"
-      />
+      />    
       <MetricCard
-        title="Avg. Ticket"
+        title="Avg. Payment Size"
         value={stats.totalVolume / (stats.totalCount || 1)}
-        isCurrency={false}
+        isCurrency={true}
         color="text-orange-500"
         suffix=""
       />
