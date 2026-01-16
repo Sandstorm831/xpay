@@ -31,7 +31,7 @@ export default function MethodDistribution() {
     .sort((a, b) => b.value - a.value);
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-[400px] flex flex-col">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-100 flex flex-col">
       <h3 className="font-bold text-slate-700 mb-2">Payment Methods</h3>
       <div className="grow">
         <ChartWrapper>
@@ -41,9 +41,8 @@ export default function MethodDistribution() {
                 data={data}
                 cx="50%"
                 cy="50%"
-                innerRadius={60}
                 outerRadius={80}
-                paddingAngle={5}
+                paddingAngle={1}
                 dataKey="value"
                 animationDuration={500}
               >
@@ -61,7 +60,7 @@ export default function MethodDistribution() {
                   boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                 }}
               />
-              <Legend verticalAlign="bottom" height={36} iconType="circle" />
+              <Legend verticalAlign="bottom" height={48} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </ChartWrapper>
