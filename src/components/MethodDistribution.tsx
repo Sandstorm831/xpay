@@ -21,7 +21,7 @@ const COLORS = [
 ];
 
 export default function MethodDistribution() {
-  const byMethod = usePaymentStore((state) => state.stats.byMethod);
+  const byMethod = usePaymentStore((state) => state.graphStats.byMethod);
 
   const data = Object.entries(byMethod)
     .map(([name, value]) => ({

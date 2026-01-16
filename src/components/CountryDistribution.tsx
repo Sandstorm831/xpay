@@ -12,13 +12,13 @@ import {
 import ChartWrapper from "./ChartWrapper";
 
 export default function CountryDistribution() {
-  const byCountry = usePaymentStore((state) => state.stats.byCountry);
-  console.log("byCountry = ", byCountry);
+  const byCountry = usePaymentStore((state) => state.graphStats.byCountry);
+//   console.log("byCountry = ", byCountry);
   // Transform { IN: 10, US: 5 } into [{ name: 'India', value: 10 }]
   const data = Object.entries(byCountry)
     .map(([name, value]) => ({ name, value }))
     .sort((a, b) => b.value - a.value); // Keep highest at the top
-  console.log("data = ", data);
+//   console.log("data = ", data);
   const COLORS = [
     "#3b82f6",
     "#10b981",
@@ -30,7 +30,7 @@ export default function CountryDistribution() {
   ];
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-[400px]">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 h-100">
       <h3 className="font-bold text-slate-700 mb-2">Volume by Country</h3>
       <div className="h-full w-full pb-6">
         <ChartWrapper>

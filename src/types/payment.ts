@@ -31,6 +31,10 @@ export interface PaymentEvent {
 export interface DashboardStats {
   totalVolume: number;
   totalCount: number;
+  totalSuccess: number;
+}
+
+export interface GraphStats{
   byCountry: Partial<Record<CountryCode, number>>;
   byMethod: Partial<Record<PaymentMethod, number>>;
 }

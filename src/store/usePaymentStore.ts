@@ -4,12 +4,14 @@ import {
   PaymentEvent,
   DashboardStats,
   ConnectionEvent,
+  GraphStats,
 } from "../types/payment";
 import { convertToUSD } from "../lib/utils";
 
 interface PaymentState {
   events: PaymentEvent[];
-  stats: DashboardStats;
+  LiveStats: DashboardStats;
+  graphStats: GraphStats;
   isConnected: boolean;
   connect: () => void;
   disconnect: () => void;
@@ -17,16 +19,20 @@ interface PaymentState {
 
 // 1. Temporary buffer (Lives outside of React state to prevent re-renders)
 let eventBuffer: PaymentEvent[] = [];
+let graphBuffer: PaymentEvent[] = [];
 let eventSource: EventSource | null = null;
-let flushInterval: NodeJS.Timeout | null = null; // Track the interval
+let fastInterval: NodeJS.Timeout | null = null; // Track the interval
+let graphInterval: NodeJS.Timeout | null = null; // Track the interval
 
 export const usePaymentStore = create<PaymentState>((set, get) => ({
   events: [],
   isConnected: false,
-  stats: {
+  LiveStats: {
     totalVolume: 0,
     totalCount: 0,
     totalSuccess: 0,
+  },
+  graphStats: {
     byCountry: {},
     byMethod: {},
   },
@@ -58,43 +64,68 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     };
 
     // Clear any existing interval before starting a new one
-    if (flushInterval) clearInterval(flushInterval);
+    if (fastInterval) clearInterval(fastInterval);
 
     // 2. THE FLUSH: Periodically move buffer to state (every 100ms)
-    flushInterval = setInterval(() => {
+    fastInterval = setInterval(() => {
       if (eventBuffer.length === 0) return;
 
       const newEvents = [...eventBuffer];
+      graphBuffer = [...graphBuffer, ...eventBuffer]
       eventBuffer = []; // Clear buffer
 
       set((state) => {
         // Update Stats in a single pass for performance
         const updatedStats = {
-          ...state.stats,
-          byCountry: { ...state.stats.byCountry },
-          byMethod: { ...state.stats.byMethod },
+          ...state.LiveStats,
         };
 
         newEvents.forEach((evt) => {
-          console.log(evt);
+        //   console.log(evt);
           updatedStats.totalCount += 1;
           const amountInUSD = convertToUSD(evt.amount, evt.currency);
           updatedStats.totalVolume += amountInUSD;
           updatedStats.totalSuccess += (evt.status === 'success' ? 1 : 0);
-          updatedStats.byCountry[evt.country] =
-            (updatedStats.byCountry[evt.country] || 0) + 1;
-          updatedStats.byMethod[evt.paymentMethod] =
-            (updatedStats.byMethod[evt.paymentMethod] || 0) + 1;
           if (evt.status === 'failed') console.log("failed event: ", evt)
         });
 
         return {
           // Keep only last 1000 events for virtualization
           events: [...newEvents.reverse(), ...state.events].slice(0, 1000),
-          stats: updatedStats,
+          LiveStats: updatedStats,
         };
       });
     }, 100);
+
+    // Clear any existing interval before starting a new one
+    if (graphInterval) clearInterval(graphInterval);
+
+    // 3. THE FLUSH: Periodically move graph buffer to state (every 2s)
+    graphInterval = setInterval(() => {
+      if (graphBuffer.length === 0) return;
+
+      const newEvents = [...graphBuffer];
+      graphBuffer = []; // Clear buffer
+
+      set((state) => {
+        // Update Stats in a single pass for performance
+        const updatedStats = {
+          byCountry: { ...state.graphStats.byCountry },
+          byMethod: { ...state.graphStats.byMethod },
+        };
+
+        newEvents.forEach((evt) => {
+          updatedStats.byCountry[evt.country] =
+            (updatedStats.byCountry[evt.country] || 0) + 1;
+          updatedStats.byMethod[evt.paymentMethod] =
+            (updatedStats.byMethod[evt.paymentMethod] || 0) + 1;
+        });
+
+        return {
+          graphStats: updatedStats,
+        };
+      });
+    }, 2000);
 
     // Store interval cleanup if needed
   },
@@ -106,10 +137,15 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
       eventSource = null;
     }
 
-    // 2. Clear the Interval (The fix!)
-    if (flushInterval) {
-      clearInterval(flushInterval);
-      flushInterval = null;
+    // 2. Clear the Intervals
+    if (fastInterval) {
+      clearInterval(fastInterval);
+      fastInterval = null;
+    }
+
+    if (graphInterval) {
+      clearInterval(graphInterval);
+      graphInterval = null;
     }
 
     // 3. Reset UI State

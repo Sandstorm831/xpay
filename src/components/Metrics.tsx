@@ -18,7 +18,7 @@ function AnimatedNumber({ value }: { value: number }) {
 }
 
 export default function Metrics() {
-  const stats = usePaymentStore((state) => state.stats);
+  const stats = usePaymentStore((state) => state.LiveStats);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4">
