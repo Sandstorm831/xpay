@@ -1,3 +1,26 @@
+TODO:
+1. Currency Handling for total value
+2. Success rates are not recorded, and event tiles just show 100%
+```
+.
+├── app
+│   ├── layout.tsx
+│   └── page.tsx           <-- Main Dashboard (Server Component)
+├── src
+│   ├── components         <-- UI components (Cards, Table, Charts)
+│   │   ├── Dashboard.tsx  <-- Client-side wrapper
+│   │   ├── Metrics.tsx    <-- Top bar stats
+│   │   └── LiveTable.tsx  <-- Virtualized list
+│   ├── store
+│   │   └── usePaymentStore.ts <-- THE HEART: SSE logic & State
+│   ├── types
+│   │   └── payment.ts     <-- TypeScript interfaces
+│   └── lib
+│       └── utils.ts       <-- Formatting logic (currency/date)
+└── ... rest of the files
+```
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
