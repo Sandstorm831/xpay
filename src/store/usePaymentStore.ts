@@ -1,6 +1,10 @@
 // src/store/usePaymentStore.ts
 import { create } from "zustand";
-import { PaymentEvent, DashboardStats } from "../types/payment";
+import {
+  PaymentEvent,
+  DashboardStats,
+  ConnectionEvent,
+} from "../types/payment";
 
 interface PaymentState {
   events: PaymentEvent[];
@@ -35,7 +39,14 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
     eventSource.onopen = () => set({ isConnected: true });
 
     eventSource.onmessage = (event) => {
-      const data: PaymentEvent = JSON.parse(event.data);
+      const data: PaymentEvent | ConnectionEvent = JSON.parse(event.data);
+
+      // check for initial response message
+      if ("mode" in data) {
+        console.log("Connection mode updated to:", data.mode);
+        return; // Exit early so it doesn't hit the buffer
+      }
+
       eventBuffer.push(data); // Push to high-speed buffer
     };
 
@@ -57,8 +68,8 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
       set((state) => {
         // Update Stats in a single pass for performance
         const updatedStats = { ...state.stats };
-
         newEvents.forEach((evt) => {
+          console.log(evt);
           updatedStats.totalCount += 1;
           updatedStats.totalVolume += evt.amount;
           updatedStats.byCountry[evt.country] =

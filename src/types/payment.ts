@@ -34,3 +34,8 @@ export interface DashboardStats {
   byCountry: Partial<Record<CountryCode, number>>;
   byMethod: Partial<Record<PaymentMethod, number>>;
 }
+
+export interface ConnectionEvent {
+    type: string;
+    mode: "normal" | "high_traffic" | "country_focus" | "payment_spike" | "chaos";
+}
