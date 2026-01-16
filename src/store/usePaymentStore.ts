@@ -67,7 +67,12 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
 
       set((state) => {
         // Update Stats in a single pass for performance
-        const updatedStats = { ...state.stats };
+        const updatedStats = {
+          ...state.stats,
+          byCountry: { ...state.stats.byCountry },
+          byMethod: { ...state.stats.byMethod },
+        };
+
         newEvents.forEach((evt) => {
           console.log(evt);
           updatedStats.totalCount += 1;
@@ -76,6 +81,11 @@ export const usePaymentStore = create<PaymentState>((set, get) => ({
             (updatedStats.byCountry[evt.country] || 0) + 1;
           updatedStats.byMethod[evt.paymentMethod] =
             (updatedStats.byMethod[evt.paymentMethod] || 0) + 1;
+          console.log(
+            "store update event: ",
+            updatedStats.byCountry,
+            evt.country
+          );
         });
 
         return {
