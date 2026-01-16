@@ -2,7 +2,6 @@
 import React, { useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { usePaymentStore } from '@/src/store/usePaymentStore';
-import { motion, AnimatePresence } from 'framer-motion';
 
 export default function LiveTable() {
   const events = usePaymentStore((state) => state.events);
@@ -57,10 +56,10 @@ export default function LiveTable() {
                   
                   <div className="text-right">
                     <div className="font-bold text-slate-900">
-                      {event.currency} {(event.amount / 100).toFixed(2)}
+                      {event.currency} {(event.amount).toFixed(2)}
                     </div>
                     <div className="text-xs text-slate-400">
-                      {event.country} • {new Date(event.timestamp).toLocaleTimeString()}
+                      {event.country} • {new Date(event.timestamp).toUTCString  ()}
                     </div>
                   </div>
                 </div>
