@@ -18,7 +18,7 @@ A real-time payment monitoring dashboard built with [Next.js](https://nextjs.org
 
 1.  **Clone the repository:**
     ```bash
-    git clone <repository_url>
+    git clone https://github.com/Sandstorm831/xpay.git
     cd xpay
     ```
 
